@@ -1,4 +1,4 @@
-#+title: Eleven Lab Hackathon
+#+title: Eleven Labs Hackathon
 #+author: aishift
 
 * Solution overview
