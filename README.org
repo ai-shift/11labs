@@ -3,21 +3,13 @@
 
 * Solution overview
 #+begin_src plantuml :file img/component-design.png
-package "Information fetcher" {
+package "Information fetcher" {}
 
-}
+package "Indexer" {}
 
-package "Indexer" {
+package "Script generator" {}
 
-}
-
-package "Script generator" {
-
-}
-
-package "Speach generator" {
-
-}
+package "Speach generator" {}
 
 package "Agents" {
   component "Topic describer"
@@ -25,15 +17,9 @@ package "Agents" {
   component "Key differencies extractor"
 }
 
-package "Recommendations" {
+package "Recommendations" {}
 
-}
-
-
-package "Command recognizer" {
-
-}
-
+package "Command recognizer" {}
 
 "Indexer" --> "Information fetcher"
 "Script generator" --> "Indexer"
