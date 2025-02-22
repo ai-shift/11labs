@@ -39,3 +39,23 @@ package "Command recognizer" {
 
 #+RESULTS:
 [[file:img/component-design.png]]
+
+* Research
+** Tavily
+#+begin_src sh :results output replace
+curl -X POST "https://api.tavily.com/search" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer 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" \
+  -d '{
+    "query": "Whats new in the world of AI",
+    "topic": "news",
+    "time_range": "w",
+    "max_results": 20
+  }' | jq -r '.results[] | .content' > tavily_output.md
+#+end_src
+
+#+RESULTS:
+
+* To do
+- Store fresh info embeddings
+- Store personal info 
