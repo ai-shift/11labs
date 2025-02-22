@@ -21,7 +21,7 @@ package "Agents" {
   component "Script generator"
   component "Topic describer"
   component "General meaning extractor"
-  component "Key differencies extractor"
+  component "Key differences extractor"
   component "Recommendations"
   component "Speech generator"
 }
@@ -47,7 +47,7 @@ curl -X POST "https://api.tavily.com/search" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer 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" \
   -d '{
-    "query": "Whats new in the world of AI",
+    "query": "What is new in the world of AI",
     "topic": "news",
     "time_range": "w",
     "max_results": 20

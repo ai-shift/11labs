@@ -1,6 +1,12 @@
-def main():
-    print("Hello from 11labs!")
+from fastapi import APIRouter, FastAPI
+
+router = APIRouter()
 
 
-if __name__ == "__main__":
-    main()
+@router.get("/")
+async def root() -> str:
+    return "Hello"
+
+
+app = FastAPI()
+app.include_router(router)

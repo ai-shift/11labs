@@ -29,7 +29,7 @@ test-file: lint
 pre-commit: lint
 
 run:
-	uv run python __main__.py
+	uv run fastapi run main.py
 
 generate-requirements:
 	uv export --no-hashes --format requirements-txt > requirements.txt

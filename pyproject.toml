@@ -6,7 +6,9 @@ readme = "README.org"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.8",
+    "openai>=1.63.2",
     "result>=0.19.0",
+    "tavily-python>=0.5.1",
 ]
 
 [dependency-groups]
@@ -107,7 +109,7 @@ untyped_calls_exclude = [
 ]
 
 [[tool.mypy.overrides]]
-module = []
+module = ["tavily.*"]
 follow_untyped_imports = true
 
 [tool.pytest.ini_options]
