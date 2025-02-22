@@ -1,11 +1,12 @@
 [project]
-name = "11labs"
+name = "core"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.org"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.8",
+    "humps>=0.2.2",
     "openai>=1.63.2",
     "result>=0.19.0",
     "tavily-python>=0.5.1",
@@ -109,7 +110,7 @@ untyped_calls_exclude = [
 ]
 
 [[tool.mypy.overrides]]
-module = ["tavily.*"]
+module = ["tavily.*", "humps.*"]
 follow_untyped_imports = true
 
 [tool.pytest.ini_options]

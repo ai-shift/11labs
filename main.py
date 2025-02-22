@@ -1,12 +1,6 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 
-router = APIRouter()
-
-
-@router.get("/")
-async def root() -> str:
-    return "Hello"
-
+from core import web
 
 app = FastAPI()
-app.include_router(router)
+app.include_router(web.router)

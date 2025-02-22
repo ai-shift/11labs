@@ -43,17 +43,22 @@ async def fetch_news(client: AsyncTavilyClient, topic: Topic) -> News:
 
 
 @dataclass
+class StartRadioStreamFlowCommand:
+    topics: list[Topic]
+
+
+@dataclass
 class DiveDeeperFlowCommand:
-    topic: str
+    topic: Topic
     comment: None | str
 
 
 @dataclass
-class SkipTopicCommand:
+class SkipTopicFlowCommand:
     topic: str
 
 
-FlowCommand = DiveDeeperFlowCommand
+FlowCommand = StartRadioStreamFlowCommand | DiveDeeperFlowCommand | SkipTopicFlowCommand
 
 
 async def classify_flow_command(client: AsyncOpenAI, command: str) -> FlowCommand:
@@ -66,5 +71,5 @@ async def execute_flow_command(
     raise NotImplementedError
 
 
-async def text_to_speech(queue: Queue[Message]) -> None:
+async def text_to_speech(eleven_labs_api_key: str, queue: Queue[Message]) -> None:
     raise NotImplementedError
