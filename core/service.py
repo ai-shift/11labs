@@ -1,4 +1,5 @@
 from asyncio import Queue
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass
 
 from openai import AsyncOpenAI
@@ -62,6 +63,10 @@ FlowCommand = StartRadioStreamFlowCommand | DiveDeeperFlowCommand | SkipTopicFlo
 
 
 async def classify_flow_command(client: AsyncOpenAI, command: str) -> FlowCommand:
+    raise NotImplementedError
+
+
+def process_queue(client: AsyncOpenAI, queue: Queue[Message]) -> AsyncGenerator[bytes]:
     raise NotImplementedError
 
 
