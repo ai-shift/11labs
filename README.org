@@ -55,7 +55,3 @@ curl -X POST "https://api.tavily.com/search" \
 #+end_src
 
 #+RESULTS:
-
-* To do
-- Store fresh info embeddings
-- Store personal info 
