@@ -3,32 +3,38 @@
 
 * Solution overview
 #+begin_src plantuml :file img/component-design.png
-package "Information fetcher" {}
+package "Data collection and aggregation" {
+  component "Information fetcher" {
 
-package "Indexer" {}
+  }
 
-package "Script generator" {}
+  component "Indexer" {
 
-package "Speach generator" {}
+  }
+
+  database "Embeddings" {
+
+  }
+}
 
 package "Agents" {
+  component "Script generator"
   component "Topic describer"
   component "General meaning extractor"
   component "Key differencies extractor"
+  component "Recommendations"
+  component "Speech generator"
 }
 
-package "Recommendations" {}
+package "Command recognizer" {
 
-package "Command recognizer" {}
+}
 
 "Indexer" --> "Information fetcher"
-"Script generator" --> "Indexer"
-"Script generator" --> "Agents"
-"Speach generator" --> "Script generator"
-"Command recognizer" --> "Agents"
+"Indexer" --> "Embeddings"
+"Agents" --> "Embeddings"
+"Command recognizer" --> "Script generator"
 "Command recognizer" --> "Recommendations"
-"Command recognizer" --> "Speach generator"
-"Agents" --> "Script generator"
 #+end_src
 
 #+RESULTS:
