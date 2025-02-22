@@ -9,7 +9,7 @@ lint: format
 		uv run ruff check --fix; \
 		uv run mypy .; \
 	fi
-	uv run codespell .
+	uv run codespell --skip TAGS .
 	if { git diff --name-only --cached; git ls-files -m; } | grep '.sql'; then \
 		uv run sqlfluff lint --disable-progress-bar migrations/*.sql; \
 	fi
