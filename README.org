@@ -2,3 +2,47 @@
 #+author: aishift
 
 * Solution overview
+#+begin_src plantuml :file img/component-design.png
+package "Information fetcher" {
+
+}
+
+package "Indexer" {
+
+}
+
+package "Script generator" {
+
+}
+
+package "Speach generator" {
+
+}
+
+package "Agents" {
+  component "Topic describer"
+  component "General meaning extractor"
+  component "Key differencies extractor"
+}
+
+package "Recommendations" {
+
+}
+
+
+package "Command recognizer" {
+
+}
+
+
+"Indexer" --> "Information fetcher"
+"Script generator" --> "Indexer"
+"Speach generator" --> "Script generator"
+"Command recognizer" --> "Agents"
+"Command recognizer" --> "Recommendations"
+"Command recognizer" --> "Speach generator"
+"Agents" --> "Script generator"
+#+end_src
+
+#+RESULTS:
+[[file:img/component-design.png]]
