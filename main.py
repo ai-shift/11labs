@@ -1,6 +1,15 @@
-from fastapi import FastAPI
+import logging
+from typing import NoReturn
 
-from core import web
+import uvicorn
 
-app = FastAPI()
-app.include_router(web.router)
+logging.basicConfig(level=logging.INFO)
+
+
+def main() -> NoReturn:
+    uvicorn.run("core.app:app", port=8000, log_config=None)
+    raise AssertionError
+
+
+if __name__ == "__main__":
+    main()

@@ -1,10 +1,11 @@
+import logging
 import uuid
 from collections.abc import AsyncGenerator
 from typing import Annotated, ClassVar
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, Response
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, Response, WebSocket
+from fastapi.responses import FileResponse, StreamingResponse
 from humps import camel
 from openai import AsyncOpenAI
 from pydantic import BaseModel
@@ -14,6 +15,7 @@ from core import factory, service, storage
 from core.domain import StartRadioStreamFlowCommand
 
 router = APIRouter()
+log = logging.getLogger(__name__)
 
 AsyncOpenAIDependency = Annotated[AsyncOpenAI, Depends(factory.get_openai_client)]
 AsyncTavilyClientDependency = Annotated[
@@ -38,36 +40,23 @@ class CookiesModel(BaseModel):
 Cookies = Annotated[CookiesModel, Cookie()]
 
 
+@router.get("/")
+async def get_index() -> FileResponse:
+    return FileResponse("index.html", media_type="text/html")
+
+
 @router.post("/sessions", status_code=201)
-async def init_session(response: Response) -> None:
-    session_id = uuid.uuid4()
-    storage.get_customer_context(session_id)
-    response.set_cookie(key="session_id", value=str(session_id))
-
-
-class SetTopicsRequestModel(ElevenLabsModel):
-    text: str
-
-
-@router.post("/topics", status_code=201)
-async def set_topics(
-    client: AsyncOpenAIDependency, req: SetTopicsRequestModel, cookies: Cookies
-) -> None:
-    context = storage.get_customer_context(cookies.session_id)
-    context.topics = await service.extract_topics(client, req.text)
-    # TODO: Fetch topics info in a background
-
-
-@router.get("/radio-streams")
-async def start_radio_stream(
+async def init_session(
     tavily_client: AsyncTavilyClientDependency,
     openai_client: AsyncOpenAIDependency,
     elevenlabs_api_key: ElevenlabsApiKeyDependency,
-    cookies: Cookies,
     background_tasks: BackgroundTasks,
-) -> StreamingResponse:
-    context = storage.get_customer_context(cookies.session_id)
-    await context.command_queue.put(StartRadioStreamFlowCommand(topics=context.topics))
+    response: Response,
+) -> None:
+    session_id = uuid.uuid4()
+    log.info("Generated session id %s", session_id)
+    context = storage.get_customer_context(session_id)
+    response.set_cookie(key="session_id", value=str(session_id))
     background_tasks.add_task(
         service.start_command_processing,
         tavily_client=tavily_client,
@@ -76,14 +65,36 @@ async def start_radio_stream(
         context=context,
     )
 
-    async def stream() -> AsyncGenerator[bytes]:
-        while True:
-            chunk = await context.audio_queue.get()
-            yield chunk.audio
 
-    return StreamingResponse(stream(), media_type="audio/wav")
+class SetTopicsRequestModel(ElevenLabsModel):
+    text: str
 
 
+@router.post("/topics", status_code=201)
+async def set_topics(
+    openai_client: AsyncOpenAIDependency, req: SetTopicsRequestModel, cookies: Cookies
+) -> None:
+    context = storage.get_customer_context(cookies.session_id)
+    context.topics = await service.extract_topics(openai_client, req.text)
+    # TODO: Fetch topics info in a background
+
+
+@router.websocket("/radio-streams")
+async def start_radio_stream(
+    websocket: WebSocket,
+    cookies: Cookies,
+) -> None:
+    context = storage.get_customer_context(cookies.session_id)
+    await context.command_queue.put(StartRadioStreamFlowCommand(topics=context.topics))
+
+    await websocket.accept()
+    
+    while True:
+        chunk = await context.audio_queue.get()
+        log.info("Yielding chunk of audio of %s bytes", len(chunk.audio))
+        await websocket.send_text(chunk.audio)
+
+        
 class ProcessFlowCommandRequestModel(ElevenLabsModel):
     text: str
 
