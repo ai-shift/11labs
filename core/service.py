@@ -2,7 +2,7 @@ import asyncio
 import base64
 import json
 import logging
-from asyncio import Queue
+from asyncio import Queue, Lock
 from collections.abc import AsyncGenerator, Iterable
 from typing import assert_never
 
@@ -86,16 +86,16 @@ async def start_command_processing(
     tavily_client: AsyncTavilyClient,
     openai_client: AsyncOpenAI,
     elevenlabs_api_key: str,
+    perplexity_api_key: str,
     context: CustomerContext,
 ) -> None:
     log.info("Starting command processing")
     task = None
+    lock = Lock()
 
     while True:
         command = await context.command_queue.get()
         log.info("Processing command %s", command)
-        if task:
-            task.cancel()
 
         match command:
             case StartRadioStreamFlowCommand(topics=topics):
@@ -106,32 +106,64 @@ async def start_command_processing(
                         elevenlabs_api_key,
                         topics,
                         context.audio_queue,
+                        lock
                     )
                 )
 
             case SkipTopicFlowCommand(topic=_topic):
                 log.error("Got unimplemented command %s", command)
 
-            case DiveDeeperFlowCommand(topic=_topic, commentary=_commentary):
-                log.error("Got unimplemented command %s", command)
+            case DiveDeeperFlowCommand(topic=topic, commentary=commentary):
+                task = asyncio.create_task(
+                        dive_deeper(
+                            perplexity_api_key,
+                            openai_client,
+                            elevenlabs_api_key,
+                            topic,
+                            commentary,
+                            context.audio_queue,
+                            lock
+                        )
+                    )
 
             case _:
                 assert_never(command)
 
 
 async def stream_radio(
-    tavily_client: AsyncTavilyClient,
+    tavily_client: AsyncTavilyClient,    
     openai_client: AsyncOpenAI,
     eleven_labs_api_key: str,
     topics: Iterable[Topic],
     queue: Queue[AudioChunkGeneratedMessage],
+    lock: Lock
 ) -> None:
     for topic in topics:
         log.info("Starting radio for topic %s", topic)
         news = await fetch_news(tavily_client, topic)
-        script_chunks = generate_script(openai_client, news)
+        script_chunks = generate_script(openai_client, '\n'.join(item.content for item in news.items))
         audio_chunks = generate_audio(eleven_labs_api_key, script_chunks)
         log.info("Starting radio streaming")
+        async for chunk in audio_chunks:
+            async with lock:
+                await queue.put(AudioChunkGeneratedMessage(chunk))
+
+
+async def dive_deeper(
+    perplexity_api_key: str,
+    openai_client: AsyncOpenAI,
+    eleven_labs_api_key: str,
+    topic: Topic,
+    commentary: None | str,
+    queue: Queue[AudioChunkGeneratedMessage],
+    lock: Lock
+) -> None:
+    async with lock:
+        log.info("Starting dive deeper for topic %s with commentary %s", topic, commentary)
+        info = await query_perplexity(tavily_client, topic, commentary)
+        script_chunks = generate_dive_script(openai_client, info)
+        audio_chunks = generate_audio(eleven_labs_api_key, script_chunks)
+        log.info("Starting dice deeper streaming")
         async for chunk in audio_chunks:
             await queue.put(AudioChunkGeneratedMessage(chunk))
 
@@ -154,7 +186,7 @@ async def fetch_news(client: AsyncTavilyClient, topic: Topic) -> News:
     return news
 
 
-async def generate_script(client: AsyncOpenAI, news: News) -> AsyncGenerator[str]:
+async def generate_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]:
     stream = await client.chat.completions.create(
         messages=[
             {
@@ -168,10 +200,7 @@ async def generate_script(client: AsyncOpenAI, news: News) -> AsyncGenerator[str
             },
             {
                 "role": "user",
-                "content": (
-                    "Process the following news:"
-                    f" {'\n'.join(item.content for item in news.items)}"
-                ),
+                "content": f"Process the following news: {news}"
             },
             {
                 "role": "user",
@@ -243,3 +272,103 @@ async def generate_audio(
                 yield data["audio"]
 
         await websocket.send(json.dumps({"text": ""}))
+
+
+async def query_perplexity(
+    token: str,
+    topic: str,
+    commentary: str
+) -> str:
+    url = "https://api.perplexity.ai/chat/completions"
+
+    payload = {
+        "model": "sonar",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Dive deeper and discuss given topic based on the recent news"
+            },
+            {
+                "role": "user",
+                "content": f"Topic: {topic}, commentary: {commentary}"
+            }
+        ],
+        "max_tokens": 1000,
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "search_domain_filter": None,
+        "return_images": False,
+        "return_related_questions": False,
+        "search_recency_filter": "<string>",
+        "top_k": 0,
+        "stream": False,
+        "presence_penalty": 0,
+        "frequency_penalty": 1,
+        "response_format": None
+    }
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json=payload, headers=headers)
+        response.raise_for_status()  # Raise exception for 4XX/5XX status codes
+        response = response.json()
+
+    return response["choices"]["message"]["content"]
+
+
+async def generate_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]:
+    stream = await client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": """
+                You are radio news author. Your task is to take the input text provided
+                and turn it into an engaging, informative speech.
+                Your goal is to extract the key points and interesting facts.
+                Define all terms used carefully for a broad audience of listeners.
+                """,
+            },
+            {
+                "role": "user",
+                "content": f"Process the following news: {news}"
+
+            },
+            {
+                "role": "user",
+                "content": """
+                Write your engaging, informative story tell here
+                Use a conversational tone and include any necessary context
+                or explanations to make the content accessible to a general audience.
+                Design your output to be read aloud -- it will be directly converted
+                into audio.
+
+                Describe the actual topic fast without any irrelevant info.
+
+                Separate each speech part by two new line characters (`\n\n`)
+                """,
+            },
+        ],
+        model="gpt-4o",
+        stream=True,
+    )
+
+    buffer = []
+    async for chunk in stream:
+        content = chunk.choices[0].delta.content or ""
+        match content.split("\n\n"):
+            case [single]:
+                buffer.append(single)
+            case [tail, *buffers]:
+                buffer.append(tail)
+                text = "".join(buffer)
+                log.info("Yielding text chunk of size %s", len(text))
+                yield text
+                for buf in buffers:
+                    yield buf
+                buffer = []
+            case _unexpected:
+                raise ValueError

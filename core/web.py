@@ -93,6 +93,7 @@ async def start_radio_stream(
         chunk = await context.audio_queue.get()
         log.info("Yielding chunk of audio of %s bytes", len(chunk.audio))
         await websocket.send_text(chunk.audio)
+        await websocket.receive_text()
 
         
 class ProcessFlowCommandRequestModel(ElevenLabsModel):
