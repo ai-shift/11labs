@@ -128,10 +128,9 @@ async def generate_script(client: AsyncOpenAI, news: News) -> AsyncGenerator[str
             {
                 "role": "system",
                 "content": """
-                You are podcast author. Your task is to take the input text provided
-                and turn it into an engaging, informative podcast monologue.
-                Your goal is to extract the key points and interesting facts
-                that could be discussed in a podcast.
+                You are radio news author. Your task is to take the input text provided
+                and turn it into an engaging, informative speech.
+                Your goal is to extract the key points and interesting facts.
                 Define all terms used carefully for a broad audience of listeners.
                 """,
             },
