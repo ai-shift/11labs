@@ -1,8 +1,9 @@
 import uuid
+from collections.abc import AsyncGenerator
 from typing import Annotated, ClassVar
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from humps import camel
 from openai import AsyncOpenAI
@@ -54,14 +55,18 @@ async def set_topics(
 
 @router.get("/radio-streams")
 async def start_radio_stream(
-    client: AsyncOpenAIDependency, cookies: Cookies
+    client: AsyncOpenAIDependency, cookies: Cookies, background_tasks: BackgroundTasks
 ) -> StreamingResponse:
     context = storage.get_customer_context(cookies.session_id)
-    stream = service.process_queue(client, context.queue)
-    await service.execute_flow_command(
-        client, StartRadioStreamFlowCommand(topics=context.topics), context.queue
-    )
-    return StreamingResponse(stream, media_type="audio/wav")
+    await context.command_queue.put(StartRadioStreamFlowCommand(topics=context.topics))
+    background_tasks.add_task(service.start_command_processing, client, context)
+
+    async def stream() -> AsyncGenerator[bytes]:
+        while True:
+            chunk = await context.audio_queue.get()
+            yield chunk.audio
+
+    return StreamingResponse(stream(), media_type="audio/wav")
 
 
 class ProcessFlowCommandRequestModel(ElevenLabsModel):
@@ -82,4 +87,4 @@ async def process_flow_command(
         raise HTTPException(status_code=400) from None
 
     context = storage.get_customer_context(cookies.session_id)
-    await service.execute_flow_command(client, flow_command, context.queue)
+    await context.command_queue.put(flow_command)
