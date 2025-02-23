@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 from typing import Annotated, ClassVar
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, Cookie
 from fastapi.responses import StreamingResponse
 from humps import camel
 from openai import AsyncOpenAI
@@ -30,7 +30,7 @@ class CookiesModel(BaseModel):
     session_id: UUID
 
 
-Cookies = Annotated[CookiesModel, CookiesModel()]
+Cookies = Annotated[CookiesModel, Cookie()]
 
 
 @router.post("/sessions", status_code=201)

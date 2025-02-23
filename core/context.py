@@ -1,7 +1,7 @@
 from asyncio import Queue
 from dataclasses import dataclass, field
 
-from core.service import (
+from core.domain import (
     AudioChunkGeneratedMessage,
     FlowCommand,
     TextChunkGeneratedMessage,

@@ -1,10 +1,8 @@
 import asyncio
 import base64
 import json
-import time
 from asyncio import Queue
 from collections.abc import AsyncGenerator, Iterable
-from dataclasses import dataclass, field
 from typing import assert_never
 
 import websockets
@@ -13,51 +11,20 @@ from pydantic import BaseModel
 from tavily.async_tavily import AsyncTavilyClient
 
 from core.context import CustomerContext
-
-
-@dataclass
-class TextChunkGeneratedMessage:
-    text: str
-
-
-@dataclass
-class AudioChunkGeneratedMessage:
-    audio: bytes
-
-
-@dataclass
-class Topic:
-    title: str
+from core.domain import (
+    AudioChunkGeneratedMessage,
+    DiveDeeperFlowCommand,
+    FlowCommand,
+    News,
+    NewsItem,
+    SkipTopicFlowCommand,
+    StartRadioStreamFlowCommand,
+    Topic,
+)
 
 
 async def extract_topics(client: AsyncOpenAI, text: str) -> list[Topic]:
     raise NotImplementedError
-
-
-@dataclass
-class _FlowCommandBase:
-    timestamp: float = field(default_factory=time.time, init=False)
-
-
-@dataclass
-class StartRadioStreamFlowCommand(_FlowCommandBase):
-    topics: list[Topic]
-
-
-@dataclass
-class DiveDeeperFlowCommand(_FlowCommandBase):
-    topic: Topic
-    commentary: None | str
-
-
-@dataclass
-class SkipTopicFlowCommand(_FlowCommandBase):
-    topic: str
-
-
-FlowCommand = (
-    StartRadioStreamFlowCommand | DiveDeeperFlowCommand | StartRadioStreamFlowCommand
-)
 
 
 # TODO: Ask back qualifing question if command is unclear
@@ -137,17 +104,6 @@ async def stream_radio(
         audio_chunks = generate_audio(eleven_labs_api_key, script_chunks)
         async for chunk in audio_chunks:
             await queue.put(AudioChunkGeneratedMessage(chunk))
-
-
-@dataclass
-class NewsItem:
-    content: str
-    url: str
-
-
-@dataclass
-class News:
-    items: list[NewsItem]
 
 
 async def fetch_news(client: AsyncTavilyClient, topic: Topic) -> News:
