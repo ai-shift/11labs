@@ -1,11 +1,11 @@
 import asyncio
-import base64
 import json
 import logging
-from asyncio import Queue, Lock
+from asyncio import Lock, Queue
 from collections.abc import AsyncGenerator, Iterable
 from typing import assert_never
 
+import httpx
 import websockets
 from openai import AsyncOpenAI
 from pydantic import BaseModel
@@ -106,7 +106,7 @@ async def start_command_processing(
                         elevenlabs_api_key,
                         topics,
                         context.audio_queue,
-                        lock
+                        lock,
                     )
                 )
 
@@ -115,33 +115,35 @@ async def start_command_processing(
 
             case DiveDeeperFlowCommand(topic=topic, commentary=commentary):
                 task = asyncio.create_task(
-                        dive_deeper(
-                            perplexity_api_key,
-                            openai_client,
-                            elevenlabs_api_key,
-                            topic,
-                            commentary,
-                            context.audio_queue,
-                            lock
-                        )
+                    dive_deeper(
+                        perplexity_api_key,
+                        openai_client,
+                        elevenlabs_api_key,
+                        topic,
+                        commentary,
+                        context.audio_queue,
+                        lock,
                     )
+                )
 
             case _:
                 assert_never(command)
 
 
 async def stream_radio(
-    tavily_client: AsyncTavilyClient,    
+    tavily_client: AsyncTavilyClient,
     openai_client: AsyncOpenAI,
     eleven_labs_api_key: str,
     topics: Iterable[Topic],
     queue: Queue[AudioChunkGeneratedMessage],
-    lock: Lock
+    lock: Lock,
 ) -> None:
     for topic in topics:
         log.info("Starting radio for topic %s", topic)
         news = await fetch_news(tavily_client, topic)
-        script_chunks = generate_script(openai_client, '\n'.join(item.content for item in news.items))
+        script_chunks = generate_script(
+            openai_client, "\n".join(item.content for item in news.items)
+        )
         audio_chunks = generate_audio(eleven_labs_api_key, script_chunks)
         log.info("Starting radio streaming")
         async for chunk in audio_chunks:
@@ -156,11 +158,13 @@ async def dive_deeper(
     topic: Topic,
     commentary: None | str,
     queue: Queue[AudioChunkGeneratedMessage],
-    lock: Lock
+    lock: Lock,
 ) -> None:
     async with lock:
-        log.info("Starting dive deeper for topic %s with commentary %s", topic, commentary)
-        info = await query_perplexity(tavily_client, topic, commentary)
+        log.info(
+            "Starting dive deeper for topic %s with commentary %s", topic, commentary
+        )
+        info = await query_perplexity(perplexity_api_key, topic, commentary)
         script_chunks = generate_dive_script(openai_client, info)
         audio_chunks = generate_audio(eleven_labs_api_key, script_chunks)
         log.info("Starting dice deeper streaming")
@@ -198,10 +202,7 @@ async def generate_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]
                 Define all terms used carefully for a broad audience of listeners.
                 """,
             },
-            {
-                "role": "user",
-                "content": f"Process the following news: {news}"
-            },
+            {"role": "user", "content": f"Process the following news: {news}"},
             {
                 "role": "user",
                 "content": """
@@ -274,11 +275,7 @@ async def generate_audio(
         await websocket.send(json.dumps({"text": ""}))
 
 
-async def query_perplexity(
-    token: str,
-    topic: str,
-    commentary: str
-) -> str:
+async def query_perplexity(token: str, topic: str, commentary: str) -> str:
     url = "https://api.perplexity.ai/chat/completions"
 
     payload = {
@@ -286,12 +283,9 @@ async def query_perplexity(
         "messages": [
             {
                 "role": "system",
-                "content": "Dive deeper and discuss given topic based on the recent news"
+                "content": "Dive deeper and discuss given topic based on the recent news",
             },
-            {
-                "role": "user",
-                "content": f"Topic: {topic}, commentary: {commentary}"
-            }
+            {"role": "user", "content": f"Topic: {topic}, commentary: {commentary}"},
         ],
         "max_tokens": 1000,
         "temperature": 0.2,
@@ -304,13 +298,10 @@ async def query_perplexity(
         "stream": False,
         "presence_penalty": 0,
         "frequency_penalty": 1,
-        "response_format": None
+        "response_format": None,
     }
 
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, json=payload, headers=headers)
@@ -320,7 +311,7 @@ async def query_perplexity(
     return response["choices"]["message"]["content"]
 
 
-async def generate_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]:
+async def generate_dive_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]:
     stream = await client.chat.completions.create(
         messages=[
             {
@@ -332,11 +323,7 @@ async def generate_script(client: AsyncOpenAI, news: str) -> AsyncGenerator[str]
                 Define all terms used carefully for a broad audience of listeners.
                 """,
             },
-            {
-                "role": "user",
-                "content": f"Process the following news: {news}"
-
-            },
+            {"role": "user", "content": f"Process the following news: {news}"},
             {
                 "role": "user",
                 "content": """
