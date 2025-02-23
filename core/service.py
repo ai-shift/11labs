@@ -110,10 +110,10 @@ async def start_command_processing(
                 )
 
             case SkipTopicFlowCommand(topic=_topic):
-                pass
+                log.error("Got unimplemented command %s", command)
 
             case DiveDeeperFlowCommand(topic=_topic, commentary=_commentary):
-                raise NotImplementedError
+                log.error("Got unimplemented command %s", command)
 
             case _:
                 assert_never(command)
