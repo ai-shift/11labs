@@ -35,31 +35,31 @@ async def classify_flow_command(client: AsyncOpenAI, command: str) -> FlowComman
             {
                 "role": "developer",
                 "content": """
-                You should classify given text into the follwoing groups:
-                - StartRadioStreamFlowCommand. It should containt topics
+                You should classify given text into the following groups:
+                - StartRadioStreamFlowCommand. It should contain topics
                   to describe as well
                 - DiveDeeperFlowCommand. It should contain topic to dive deeper
                   and optional commentary
-                - SkipTopicFlowCommand. It should containt topic to skip
+                - SkipTopicFlowCommand. It should contain topic to skip
                 """,
             },
             {"role": "user", "content": command},
         ],
         response_format=_ClassifyFlowCommandResponseModel,
-    )
+    )  # type: ignore
     result = completion.choices[0].message.parsed
     assert isinstance(result, FlowCommand)
     return result
 
 
 class _ClassifyFlowCommandResponseModel(BaseModel):
-    command: FlowCommand
+    command: str
 
 
 async def start_command_processing(
     tavily_client: AsyncTavilyClient,
     openai_client: AsyncOpenAI,
-    eleven_labs_api_key: str,
+    elevenlabs_api_key: str,
     context: CustomerContext,
 ) -> None:
     task = None
@@ -75,16 +75,16 @@ async def start_command_processing(
                     stream_radio(
                         tavily_client,
                         openai_client,
-                        eleven_labs_api_key,
+                        elevenlabs_api_key,
                         topics,
                         context.audio_queue,
                     )
                 )
 
-            case DiveDeeperFlowCommand(topic=_topic, commentary=_commentary):
-                raise NotImplementedError
-
             case SkipTopicFlowCommand(topic=_topic):
+                pass
+
+            case DiveDeeperFlowCommand(topic=_topic, commentary=_commentary):
                 raise NotImplementedError
 
             case _:
@@ -108,7 +108,7 @@ async def stream_radio(
 
 async def fetch_news(client: AsyncTavilyClient, topic: Topic) -> News:
     response = await client.search(
-        query=f"Whats new in the field of {topic}",
+        query=f"What's new in the field of {topic}",
         search_depth="advanced",
         topic="news",
         time_range="w",

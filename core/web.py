@@ -3,18 +3,23 @@ from collections.abc import AsyncGenerator
 from typing import Annotated, ClassVar
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, Cookie
+from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from humps import camel
 from openai import AsyncOpenAI
 from pydantic import BaseModel
+from tavily.async_tavily import AsyncTavilyClient
 
 from core import factory, service, storage
-from core.service import StartRadioStreamFlowCommand
+from core.domain import StartRadioStreamFlowCommand
 
 router = APIRouter()
 
 AsyncOpenAIDependency = Annotated[AsyncOpenAI, Depends(factory.get_openai_client)]
+AsyncTavilyClientDependency = Annotated[
+    AsyncTavilyClient, Depends(factory.get_tavily_client)
+]
+ElevenlabsApiKeyDependency = Annotated[str, Depends(factory.get_elevenlabs_api_key)]
 
 
 class ElevenLabsModel(BaseModel):
@@ -55,11 +60,21 @@ async def set_topics(
 
 @router.get("/radio-streams")
 async def start_radio_stream(
-    client: AsyncOpenAIDependency, cookies: Cookies, background_tasks: BackgroundTasks
+    tavily_client: AsyncTavilyClientDependency,
+    openai_client: AsyncOpenAIDependency,
+    elevenlabs_api_key: ElevenlabsApiKeyDependency,
+    cookies: Cookies,
+    background_tasks: BackgroundTasks,
 ) -> StreamingResponse:
     context = storage.get_customer_context(cookies.session_id)
     await context.command_queue.put(StartRadioStreamFlowCommand(topics=context.topics))
-    background_tasks.add_task(service.start_command_processing, client, context)
+    background_tasks.add_task(
+        service.start_command_processing,
+        tavily_client=tavily_client,
+        openai_client=openai_client,
+        elevenlabs_api_key=elevenlabs_api_key,
+        context=context,
+    )
 
     async def stream() -> AsyncGenerator[bytes]:
         while True:

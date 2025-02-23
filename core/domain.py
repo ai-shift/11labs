@@ -1,5 +1,4 @@
-import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -18,29 +17,22 @@ class Topic:
 
 
 @dataclass
-class _FlowCommandBase:
-    timestamp: float = field(default_factory=time.time, init=False)
-
-
-@dataclass
-class StartRadioStreamFlowCommand(_FlowCommandBase):
+class StartRadioStreamFlowCommand:
     topics: list[Topic]
 
 
 @dataclass
-class DiveDeeperFlowCommand(_FlowCommandBase):
+class DiveDeeperFlowCommand:
     topic: Topic
     commentary: None | str
 
 
 @dataclass
-class SkipTopicFlowCommand(_FlowCommandBase):
+class SkipTopicFlowCommand:
     topic: str
 
 
-FlowCommand = (
-    StartRadioStreamFlowCommand | DiveDeeperFlowCommand | StartRadioStreamFlowCommand
-)
+FlowCommand = StartRadioStreamFlowCommand | DiveDeeperFlowCommand | SkipTopicFlowCommand
 
 
 @dataclass
