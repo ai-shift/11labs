@@ -23,7 +23,7 @@ export default function MainActions() {
     const timer1 = setTimeout(() => setDigestState(DigestState.AlmostReady), 3000)
     const timer2 = setTimeout(() => {
       setDigestState(DigestState.Ready)
-      setDigestTopic("AI Advancements in 2025")
+      // setDigestTopic("AI Advancements in 2025")
     }, 6000)
 
     return () => {
@@ -42,17 +42,6 @@ export default function MainActions() {
         return "bg-green-500"
     }
   }, [digestState])
-
-  const getButtonCaption = useCallback(() => {
-    switch (digestState) {
-      case DigestState.Preparing:
-        return "Digest not yet ready"
-      case DigestState.AlmostReady:
-        return "Digest will be ready soon"
-      case DigestState.Ready:
-        return digestTopic
-    }
-  }, [digestState, digestTopic])
 
   const handlePlayClick = useCallback(() => {
     if (digestState === DigestState.Ready) {
@@ -100,15 +89,9 @@ export default function MainActions() {
           <div className={`absolute inset-2 ${getButtonColor()} rounded-full opacity-50`}></div>
           <Play className="w-8 h-8 z-10 relative" />
         </Button>
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-          <span className="bg-black text-white text-xs py-1 px-2 rounded-full">{getButtonCaption()}</span>
-        </div>
       </div>
       <Button variant="outline" className="w-16 h-16 rounded-full border-2 hover:bg-gray-50 shadow-md">
         <Mic className="w-6 h-6" />
-      </Button>
-      <Button variant="ghost" size="icon" className="absolute top-0 right-4" onClick={handleCustomize}>
-        <Settings className="w-6 h-6" />
       </Button>
       {showAudioPlayback && <AudioPlayback onClose={() => setShowAudioPlayback(false)} />}
       <div className="flex space-x-4">

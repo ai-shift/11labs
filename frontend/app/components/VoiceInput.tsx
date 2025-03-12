@@ -34,12 +34,13 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
     }
   }, [transcript, isRecording, useVoice])
 
+  let timeoutId: NodeJS.Timeout | undefined;
+
   const handleTranscriptProcessing = async () => {
     setIsProcessing(true)
     setProcessingError(null)
 
     try {
-      // Step 1: Initialize session first
       console.log("Initializing session...")
       const sessionResponse = await apiClient.initSession()
       if (!sessionResponse.success) {
@@ -47,7 +48,6 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
       }
       console.log("Session initialized successfully")
 
-      // Step 2: Set topics
       console.log("Setting topics with transcript:", transcript)
       const topicsResponse = await apiClient.setTopics(transcript)
       if (!topicsResponse.success) {
@@ -55,30 +55,16 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
       }
       console.log("Topics set successfully")
 
-      // Parse user data from transcript
-      const userData = {
-        name: transcript.split("name is ")[1]?.split(" ")[0] || "Unknown",
-        interests:
-          transcript
-            .toLowerCase()
-            .split("interests are ")[1]
-            ?.split(" and ")
-            .map((i) => i.trim()) || [],
-        topicsToFollow:
-          transcript
-            .toLowerCase()
-            .split("interests are ")[1]
-            ?.split(" and ")
-            .map((i) => i.trim()) || []
-      }
-
-      console.log("Parsed user data:", userData)
       setShowSuccess(true)
 
-      // Wait for animation before completing
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (onComplete) {
-          onComplete(userData)
+          // TODO: Use data returned from API
+          onComplete({
+              name: "Dummy name",
+              interests: ["interest1", "interest2"],
+              topicsToFollow: []
+          })
         }
       }, 2000)
     } catch (err) {
@@ -88,6 +74,9 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
       )
     } finally {
       setIsProcessing(false)
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 
