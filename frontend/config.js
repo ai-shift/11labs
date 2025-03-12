@@ -1,2 +1,2 @@
-const BACKEND_ENDPOINT = process.env.NEXT_PUBLIC_BACKEND_ENDPOINT || 'http://localhost:3000';
-export { BACKEND_ENDPOINT };
+const BACKEND_HOST = process.env.NEXT_PUBLIC_BACKEND_HOST || 'http://localhost:5000';
+export { BACKEND_HOST };
