@@ -68,7 +68,7 @@ async def init_session(
     session_id = uuid.uuid4()
     log.info("Generated session id %s", session_id)
     context = storage.get_customer_context(session_id)
-    # response.set_cookie(key="session_id", value=str(session_id))
+    response.set_cookie(key="session_id", value=str(session_id))
     background_tasks.add_task(
         service.start_command_processing,
         tavily_client=tavily_client,

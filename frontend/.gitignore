@@ -1,0 +1,105 @@
+# Symlinks and References Management
+## Base references directory - ignore by default
+.references/*
+.next/
+node_modules/
+pnpm-lock.yaml
+## Allow specific reference folders but ignore their heavy contents
+# !.references/*/
+.references/*/node_modules/
+.references/*/.git/
+.references/*/dist/
+.references/*/build/
+.references/*/.cache/
+.references/*/vendor/
+.references/*/__pycache__/
+uv.lock
+## Allow specific project completely
+# !.references/important-project/**
+
+## Or ignoring specific projects entirely:
+.references/large-project-*/**
+
+## Or allowing specific heavy folders when needed:
+# !.references/special-project/node_modules/critical-package/
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build and Dependencies
+node_modules/
+vendor/
+dist/
+build/
+out/
+.cache/
+.temp/
+__pycache__/
+
+# Environment and Secrets
+.env
+.env.*
+*.env
+config.json
+venv/
+
+# Compiled and Binary Files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.dylib
+*.pyc
+
+# Media and Large Files
+*.pdf
+*.mp4
+*.mp3
+*.mov
+*.avi
+*.wmv
+*.flv
+*.wav
+*.jpg
+*.png
+*.gif
+*.svg
+*.webp
+*.tiff
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Logs and Databases
+*.log
+*.sql
+*.sqlite
+*.db
+logs/
+
+# Project-specific
+.references/*
+assets/
+media/
+docs/
+!README.md
+
+# Temporary Files
+tmp/
+temp/
+*.debug
+*.tmp
+
+*.tar.xz
+*.tar.zst
