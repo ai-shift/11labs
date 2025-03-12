@@ -15,10 +15,6 @@ if (!config.openaiApiKey) {
   console.error('Missing OpenAI API key in environment variables');
 }
 
-if (!config.backendEndpoint) {
-  console.warn('Missing backend endpoint in environment variables');
-}
-
 // Helper function to get full endpoint URL
 export const getEndpointUrl = (endpoint: keyof typeof config.apiEndpoints) => {
   return `${BACKEND_HOST}${config.apiEndpoints[endpoint]}`;
