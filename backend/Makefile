@@ -31,5 +31,6 @@ pre-commit: lint
 run:
 	uv run python main.py
 
+
 generate-requirements:
 	uv export --no-hashes --format requirements-txt > requirements.txt

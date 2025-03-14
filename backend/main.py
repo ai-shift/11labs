@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main() -> NoReturn:
-    uvicorn.run("core.app:app", port=8000, log_config=None)
+    uvicorn.run("core.app:app", port=5000, log_config=None)
     raise AssertionError
 
 

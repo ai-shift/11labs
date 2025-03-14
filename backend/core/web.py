@@ -1,11 +1,19 @@
 import logging
+import os
 import uuid
-from collections.abc import AsyncGenerator
 from typing import Annotated, ClassVar
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, Response, WebSocket
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Cookie,
+    Depends,
+    HTTPException,
+    Response,
+    WebSocket,
+)
+from fastapi.responses import FileResponse
 from humps import camel
 from openai import AsyncOpenAI
 from pydantic import BaseModel
@@ -22,6 +30,9 @@ AsyncTavilyClientDependency = Annotated[
     AsyncTavilyClient, Depends(factory.get_tavily_client)
 ]
 ElevenlabsApiKeyDependency = Annotated[str, Depends(factory.get_elevenlabs_api_key)]
+PerplexityApiKeyDependency = Annotated[
+    str, Depends(lambda: os.environ["PERPLEXITY_API_KEY"])
+]
 
 
 class ElevenLabsModel(BaseModel):
@@ -50,6 +61,7 @@ async def init_session(
     tavily_client: AsyncTavilyClientDependency,
     openai_client: AsyncOpenAIDependency,
     elevenlabs_api_key: ElevenlabsApiKeyDependency,
+    perplexity_api_key: PerplexityApiKeyDependency,
     background_tasks: BackgroundTasks,
     response: Response,
 ) -> None:
@@ -62,6 +74,7 @@ async def init_session(
         tavily_client=tavily_client,
         openai_client=openai_client,
         elevenlabs_api_key=elevenlabs_api_key,
+        perplexity_api_key=perplexity_api_key,
         context=context,
     )
 
@@ -88,14 +101,14 @@ async def start_radio_stream(
     await context.command_queue.put(StartRadioStreamFlowCommand(topics=context.topics))
 
     await websocket.accept()
-    
+
     while True:
         chunk = await context.audio_queue.get()
         log.info("Yielding chunk of audio of %s bytes", len(chunk.audio))
-        await websocket.send_text(chunk.audio)
+        await websocket.send_str(chunk.audio)
         await websocket.receive_text()
 
-        
+
 class ProcessFlowCommandRequestModel(ElevenLabsModel):
     text: str
 
