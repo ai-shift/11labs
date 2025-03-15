@@ -1,4 +1,5 @@
 import { useUserInfoStore } from "features/user-info";
+import MainActions from "./components/MainActions"
 import { useNavigate } from 'react-router-dom';
 
 export function LiveAudioNewsPage() {
@@ -10,10 +11,16 @@ export function LiveAudioNewsPage() {
     }
     
     return (
-        <>
-            <h1>Live audio news page</h1>
-            <h2>User data</h2>
-            <p>{JSON.stringify(userData)}</p>
-        </>
+        <main className="min-h-screen flex">
+            <div className="flex-1 p-4">
+                <div className="max-w-2xl mx-auto">
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold">Welcome back, {userData.name}!</h1>
+                        <p className="text-gray-600">Your personalized audio digest is ready.</p>
+                    </div>
+                    <MainActions />
+                </div>
+            </div>
+        </main>
     )
 }
