@@ -1,5 +1,5 @@
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DigestView() {
   return (
@@ -11,7 +11,9 @@ export default function DigestView() {
             <CardTitle>AI Advancements</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Latest breakthroughs in machine learning and neural networks...</p>
+            <p>
+              Latest breakthroughs in machine learning and neural networks...
+            </p>
           </CardContent>
         </Card>
         <Card className="bg-white bg-opacity-10 backdrop-blur-lg">
@@ -32,6 +34,5 @@ export default function DigestView() {
         </Card>
       </div>
     </ScrollArea>
-  )
+  );
 }
-

@@ -3,18 +3,34 @@ import { ToggleRecordingButton } from "./ToggleRecordingButton";
 import { ProcessingAudioInfo } from "./ProcessingAudioInfo";
 import { AudioRecordingStatus } from "./AudioRecordingStatus";
 
-export function VoiceInputTranscriber() {
-    return (
-        {isProcessing ? (
-            <ProcessingAudioInfo />
-        ) : (
-          <div className="space-y-8">
-              {idRecording && <VolumeLevelIndictor />}
+interface VoiceInputTranscriberProps {
+  isProcessing: boolean;
+  idRecording: boolean;
+  ProcessingAudioInfo: React.ComponentType<any>;
+  VolumeLevelIndictor: React.ComponentType<any>;
+  ToggleRecordingButton: React.ComponentType<any>;
+  AudioRecordingStatus: React.ComponentType<any>;
+}
 
-              <ToggleRecordingButton />
-
-              <AudioRecordingStatus />
-          </div>
-        )}
-    )
+export function VoiceInputTranscriber({
+  isProcessing,
+  idRecording,
+  ProcessingAudioInfo,
+  VolumeLevelIndictor,
+  ToggleRecordingButton,
+  AudioRecordingStatus,
+}: VoiceInputTranscriberProps) {
+  return (
+    <>
+      {isProcessing ? (
+        <ProcessingAudioInfo />
+      ) : (
+        <div className="space-y-8">
+          {idRecording && <VolumeLevelIndictor />}
+          <ToggleRecordingButton />
+          <AudioRecordingStatus />
+        </div>
+      )}
+    </>
+  );
 }

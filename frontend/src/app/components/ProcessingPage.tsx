@@ -1,41 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 
 interface ProcessingPageProps {
-  onComplete: () => void
+  onComplete: () => void;
   userData: {
-    name: string
-    interests: string[]
-    topicsToFollow: string[]
-  }
+    name: string;
+    interests: string[];
+    topicsToFollow: string[];
+  };
 }
 
-export default function ProcessingPage({ onComplete, userData }: ProcessingPageProps) {
-  const [progress, setProgress] = useState(0)
-  const [showSuccess, setShowSuccess] = useState(false)
+export default function ProcessingPage({
+  onComplete,
+  userData,
+}: ProcessingPageProps) {
+  const [progress, setProgress] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 100) {
-          clearInterval(interval)
-          return 100
+          clearInterval(interval);
+          return 100;
         }
-        return prevProgress + 1
-      })
-    }, 30)
+        return prevProgress + 1;
+      });
+    }, 30);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (progress === 100) {
-      setShowSuccess(true)
+      setShowSuccess(true);
       // Wait for 5 seconds before calling onComplete
-      setTimeout(onComplete, 5000)
+      setTimeout(onComplete, 5000);
     }
-  }, [progress, onComplete])
+  }, [progress, onComplete]);
 
   return (
     <div className="space-y-6">
@@ -45,10 +48,14 @@ export default function ProcessingPage({ onComplete, userData }: ProcessingPageP
           style={{ width: `${progress}%` }}
         ></div>
       </div>
-      {!showSuccess && <p className="text-gray-700">Processing your information...</p>}
+      {!showSuccess && (
+        <p className="text-gray-700">Processing your information...</p>
+      )}
       {showSuccess && (
         <div className="space-y-4 animate-fade-in">
-          <p className="font-semibold text-gray-900 text-lg">Success! Your profile has been created.</p>
+          <p className="font-semibold text-gray-900 text-lg">
+            Success! Your profile has been created.
+          </p>
           <div className="space-y-2 text-gray-700">
             <p>
               <span className="font-medium">Name:</span> {userData.name}
@@ -70,10 +77,11 @@ export default function ProcessingPage({ onComplete, userData }: ProcessingPageP
               ))}
             </ul>
           </div>
-          <p className="text-sm text-gray-500 mt-4">Redirecting to main screen in a few seconds...</p>
+          <p className="text-sm text-gray-500 mt-4">
+            Redirecting to main screen in a few seconds...
+          </p>
         </div>
       )}
     </div>
-  )
+  );
 }
-

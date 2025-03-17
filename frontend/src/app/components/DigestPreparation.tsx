@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 interface DigestPreparationProps {
-  onStart: () => void
+  onStart: () => void;
 }
 
 export default function DigestPreparation({ onStart }: DigestPreparationProps) {
@@ -11,6 +11,5 @@ export default function DigestPreparation({ onStart }: DigestPreparationProps) {
       <p>We've prepared an audio digest based on your interests.</p>
       <Button onClick={onStart}>Start Listening</Button>
     </div>
-  )
+  );
 }
-

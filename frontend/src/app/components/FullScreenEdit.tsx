@@ -1,32 +1,36 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import type React from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Interest {
-  id: string
-  name: string
-  enabled: boolean
+  id: string;
+  name: string;
+  enabled: boolean;
 }
 
 interface FullScreenEditProps {
-  interest: Interest
-  onUpdate: (updatedInterest: Interest) => void
-  onClose: () => void
+  interest: Interest;
+  onUpdate: (updatedInterest: Interest) => void;
+  onClose: () => void;
 }
 
-export default function FullScreenEdit({ interest, onUpdate, onClose }: FullScreenEditProps) {
-  const [name, setName] = useState(interest.name)
-  const [enabled, setEnabled] = useState(interest.enabled)
+export default function FullScreenEdit({
+  interest,
+  onUpdate,
+  onClose,
+}: FullScreenEditProps) {
+  const [name, setName] = useState(interest.name);
+  const [enabled, setEnabled] = useState(interest.enabled);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onUpdate({ ...interest, name, enabled })
-  }
+    e.preventDefault();
+    onUpdate({ ...interest, name, enabled });
+  };
 
   return (
     <div className="fixed inset-0 bg-white z-50 p-4 flex flex-col">
@@ -37,7 +41,12 @@ export default function FullScreenEdit({ interest, onUpdate, onClose }: FullScre
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="name">Interest Name</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="w-full" />
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full"
+          />
         </div>
         <div className="flex items-center space-x-2">
           <Switch id="enabled" checked={enabled} onCheckedChange={setEnabled} />
@@ -48,6 +57,5 @@ export default function FullScreenEdit({ interest, onUpdate, onClose }: FullScre
         </Button>
       </form>
     </div>
-  )
+  );
 }
-

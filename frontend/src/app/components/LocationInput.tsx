@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Mic } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Mic } from "lucide-react";
 
 interface LocationInputProps {
-  onComplete: (location: string) => void
+  onComplete: (location: string) => void;
 }
 
 export default function LocationInput({ onComplete }: LocationInputProps) {
-  const [location, setLocation] = useState("")
-  const [isListening, setIsListening] = useState(false)
+  const [location, setLocation] = useState("");
+  const [isListening, setIsListening] = useState(false);
 
   const handleVoiceInput = () => {
-    setIsListening(true)
+    setIsListening(true);
     // Simulate voice recognition process
     setTimeout(() => {
-      setIsListening(false)
-      setLocation("New York, USA") // Simulated voice input
-    }, 2000)
-  }
+      setIsListening(false);
+      setLocation("New York, USA"); // Simulated voice input
+    }, 2000);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (location.trim()) {
-      onComplete(location.trim())
+      onComplete(location.trim());
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -48,12 +48,15 @@ export default function LocationInput({ onComplete }: LocationInputProps) {
         >
           <Mic className={`h-6 w-6 ${isListening ? "animate-pulse" : ""}`} />
         </Button>
-        <Button type="submit" disabled={!location.trim()} className="bg-gray-900 text-white hover:bg-gray-800">
+        <Button
+          type="submit"
+          disabled={!location.trim()}
+          className="bg-gray-900 text-white hover:bg-gray-800"
+        >
           Next
         </Button>
       </div>
       {isListening && <p className="text-sm text-gray-600">Listening...</p>}
     </form>
-  )
+  );
 }
-

@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Mic } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Mic } from "lucide-react";
 
 interface NameInputProps {
-  onComplete: (name: string) => void
+  onComplete: (name: string) => void;
 }
 
 export default function NameInput({ onComplete }: NameInputProps) {
-  const [name, setName] = useState("")
-  const [isListening, setIsListening] = useState(false)
+  const [name, setName] = useState("");
+  const [isListening, setIsListening] = useState(false);
 
   const handleVoiceInput = () => {
-    setIsListening(true)
+    setIsListening(true);
     // Simulate voice recognition process
     setTimeout(() => {
-      setIsListening(false)
-      setName("John Doe") // Simulated voice input
-    }, 2000)
-  }
+      setIsListening(false);
+      setName("John Doe"); // Simulated voice input
+    }, 2000);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (name.trim()) {
-      onComplete(name.trim())
+      onComplete(name.trim());
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -48,12 +48,15 @@ export default function NameInput({ onComplete }: NameInputProps) {
         >
           <Mic className={`h-6 w-6 ${isListening ? "animate-pulse" : ""}`} />
         </Button>
-        <Button type="submit" disabled={!name.trim()} className="bg-gray-900 text-white hover:bg-gray-800">
+        <Button
+          type="submit"
+          disabled={!name.trim()}
+          className="bg-gray-900 text-white hover:bg-gray-800"
+        >
           Next
         </Button>
       </div>
       {isListening && <p className="text-sm text-gray-600">Listening...</p>}
     </form>
-  )
+  );
 }
-

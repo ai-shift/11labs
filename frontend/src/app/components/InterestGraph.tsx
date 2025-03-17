@@ -1,32 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { User } from "lucide-react"
-import FullScreenInterest from "./FullScreenInterest"
-import ProfileSettings from "./ProfileSettings"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { User } from "lucide-react";
+import FullScreenInterest from "./FullScreenInterest";
+import ProfileSettings from "./ProfileSettings";
+import { Button } from "@/components/ui/button";
 
 interface Interest {
-  id: string
-  name: string
-  position: "left" | "right"
-  isDotted?: boolean
+  id: string;
+  name: string;
+  position: "left" | "right";
+  isDotted?: boolean;
 }
 
 interface InterestGraphProps {
-  interests: string[]
+  interests: string[];
 }
 
 export default function InterestGraph({ interests }: InterestGraphProps) {
-  const [selectedInterest, setSelectedInterest] = useState<Interest | null>(null)
-  const [showProfileSettings, setShowProfileSettings] = useState(false)
+  const [selectedInterest, setSelectedInterest] = useState<Interest | null>(
+    null,
+  );
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
 
   const formattedInterests: Interest[] = interests.map((interest, index) => ({
     id: index.toString(),
     name: interest,
     position: index % 2 === 0 ? "left" : "right",
     isDotted: index % 3 === 0,
-  }))
+  }));
 
   return (
     <div className="relative h-full bg-white rounded-lg shadow-inner overflow-hidden">
@@ -81,11 +83,18 @@ export default function InterestGraph({ interests }: InterestGraphProps) {
         </div>
       </div>
 
-      {selectedInterest && <FullScreenInterest interest={selectedInterest} onClose={() => setSelectedInterest(null)} />}
+      {selectedInterest && (
+        <FullScreenInterest
+          interest={selectedInterest}
+          onClose={() => setSelectedInterest(null)}
+        />
+      )}
       {showProfileSettings && (
-        <ProfileSettings interests={formattedInterests} onClose={() => setShowProfileSettings(false)} />
+        <ProfileSettings
+          interests={formattedInterests}
+          onClose={() => setShowProfileSettings(false)}
+        />
       )}
     </div>
-  )
+  );
 }
-

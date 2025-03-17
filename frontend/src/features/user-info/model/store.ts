@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface UserInfo {
   name: string;
@@ -21,7 +21,7 @@ export const useUserInfoStore = create<UserInfoState>()(
       clearUserInfo: () => set({ userData: null }),
     }),
     {
-      name: 'user-storage',
-    }
-  )
+      name: "user-storage",
+    },
+  ),
 );

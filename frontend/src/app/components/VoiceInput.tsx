@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useVoiceRecording } from "../hooks/useVoiceRecording"
-import { useEffect, useState } from "react"
-import { apiClient } from "../lib/api/client"
+import { useVoiceRecording } from "../hooks/useVoiceRecording";
+import { useEffect, useState } from "react";
+import { apiClient } from "../lib/api/client";
 
 interface VoiceInputProps {
   onComplete?: (userData: {
-    name: string
-    interests: string[]
-    topicsToFollow: string[]
-  }) => void
+    name: string;
+    interests: string[];
+    topicsToFollow: string[];
+  }) => void;
 }
 
 export default function VoiceInput({ onComplete }: VoiceInputProps) {
@@ -18,73 +18,73 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
     transcript: voiceTranscript,
     error,
     startRecording,
-    stopRecording
-  } = useVoiceRecording()
+    stopRecording,
+  } = useVoiceRecording();
 
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [processingError, setProcessingError] = useState<string | null>(null)
-  const [textInput, setTextInput] = useState('')
-  const [useVoice, setUseVoice] = useState(true)
-  const transcript = useVoice ? voiceTranscript : textInput
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const [textInput, setTextInput] = useState("");
+  const [useVoice, setUseVoice] = useState(true);
+  const transcript = useVoice ? voiceTranscript : textInput;
 
   useEffect(() => {
     if (transcript && !isRecording && useVoice) {
-      handleTranscriptProcessing()
+      handleTranscriptProcessing();
     }
-  }, [transcript, isRecording, useVoice])
+  }, [transcript, isRecording, useVoice]);
 
   let timeoutId: NodeJS.Timeout | undefined;
 
   const handleTranscriptProcessing = async () => {
-    setIsProcessing(true)
-    setProcessingError(null)
+    setIsProcessing(true);
+    setProcessingError(null);
 
     try {
-      console.log("Initializing session...")
-      const sessionResponse = await apiClient.initSession()
+      console.log("Initializing session...");
+      const sessionResponse = await apiClient.initSession();
       if (!sessionResponse.success) {
-        throw new Error("Failed to initialize session")
+        throw new Error("Failed to initialize session");
       }
-      console.log("Session initialized successfully")
+      console.log("Session initialized successfully");
 
-      console.log("Setting topics with transcript:", transcript)
-      const topicsResponse = await apiClient.setTopics(transcript)
+      console.log("Setting topics with transcript:", transcript);
+      const topicsResponse = await apiClient.setTopics(transcript);
       if (!topicsResponse.success) {
-        throw new Error("Failed to set topics")
+        throw new Error("Failed to set topics");
       }
-      console.log("Topics set successfully")
+      console.log("Topics set successfully");
 
-      setShowSuccess(true)
+      setShowSuccess(true);
 
       timeoutId = setTimeout(() => {
         if (onComplete) {
           // TODO: Use data returned from API
           onComplete({
-              name: "Dummy name",
-              interests: ["interest1", "interest2"],
-              topicsToFollow: []
-          })
+            name: "Dummy name",
+            interests: ["interest1", "interest2"],
+            topicsToFollow: [],
+          });
         }
-      }, 2000)
+      }, 2000);
     } catch (err) {
-      console.error("Processing error:", err)
+      console.error("Processing error:", err);
       setProcessingError(
-        "Failed to process your information. Please try again."
-      )
+        "Failed to process your information. Please try again.",
+      );
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
     }
-  }
+  };
 
   const handleTextSubmit = async (e: any) => {
-    e.preventDefault()
-    setUseVoice(false)
-    handleTranscriptProcessing()
-  }
+    e.preventDefault();
+    setUseVoice(false);
+    handleTranscriptProcessing();
+  };
 
   if (showSuccess) {
     return (
@@ -97,7 +97,7 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
           <p className="text-gray-700">Your profile has been created.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -200,9 +200,7 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-gray-600">
-                  Enter your information below:
-                </p>
+                <p className="text-gray-600">Enter your information below:</p>
               </div>
             )}
 
@@ -254,6 +252,5 @@ export default function VoiceInput({ onComplete }: VoiceInputProps) {
         )}
       </div>
     </div>
-  )
+  );
 }
-

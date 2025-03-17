@@ -1,5 +1,5 @@
-import { Home, Book, GitGraphIcon as Graph, Settings } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Home, Book, GitGraphIcon as Graph, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function BottomNav() {
   return (
@@ -19,6 +19,5 @@ export default function BottomNav() {
         </Button>
       </div>
     </nav>
-  )
+  );
 }
-

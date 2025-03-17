@@ -1,31 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { X, Mic } from "lucide-react"
-import { useVoiceRecording } from "@/hooks/useVoiceRecording"
-import { AudioStreamingClient } from "@/lib/api/audio"
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { X, Mic } from "lucide-react";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
+import { AudioStreamingClient } from "@/lib/api/audio";
 
 interface AudioPlaybackProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [isVoiceCommandActive, setIsVoiceCommandActive] = useState(false)
-  const [streamingState, setStreamingState] = useState<'connecting' | 'streaming' | 'stopped' | 'error'>('stopped')
-  const audioClientRef = useRef<AudioStreamingClient | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isVoiceCommandActive, setIsVoiceCommandActive] = useState(false);
+  const [streamingState, setStreamingState] = useState<
+    "connecting" | "streaming" | "stopped" | "error"
+  >("stopped");
+  const audioClientRef = useRef<AudioStreamingClient | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const {
     isRecording,
     transcript,
     error: recordingError,
     startRecording,
-    stopRecording
-  } = useVoiceRecording()
+    stopRecording,
+  } = useVoiceRecording();
 
   useEffect(() => {
     audioClientRef.current = new AudioStreamingClient(setStreamingState);
@@ -43,13 +45,13 @@ export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
   }, [transcript, isRecording]);
 
   const handleFlowCommand = async (command: string) => {
-    console.log('Sending flow command:', command);
+    console.log("Sending flow command:", command);
     try {
       if (audioClientRef.current) {
         audioClientRef.current.sendFlowCommand(command);
       }
     } catch (err) {
-      console.error('Flow command error:', err);
+      console.error("Flow command error:", err);
     } finally {
       setIsVoiceCommandActive(false);
     }
@@ -73,10 +75,10 @@ export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
   };
 
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60)
-    const seconds = Math.floor(time % 60)
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`
-  }
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -92,7 +94,7 @@ export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
 
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-center">Now Playing</h2>
-          
+
           <div className="flex items-center justify-between text-sm text-gray-500">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
@@ -123,7 +125,9 @@ export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
             {/* Voice Command Button */}
             <div className="relative w-24 h-24">
               <button
-                onClick={isVoiceCommandActive ? stopRecording : handleVoiceCommand}
+                onClick={
+                  isVoiceCommandActive ? stopRecording : handleVoiceCommand
+                }
                 className={`w-full h-full rounded-full ${
                   isVoiceCommandActive ? "bg-red-500" : "bg-gray-200"
                 } text-white hover:opacity-90 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center`}
@@ -153,13 +157,12 @@ export default function AudioPlayback({ onClose }: AudioPlaybackProps) {
 
           {/* Streaming State Indicator */}
           <div className="text-center text-sm text-gray-600">
-            {streamingState === 'connecting' && 'Connecting to audio stream...'}
-            {streamingState === 'streaming' && 'Streaming audio...'}
-            {streamingState === 'error' && 'Error connecting to audio stream'}
+            {streamingState === "connecting" && "Connecting to audio stream..."}
+            {streamingState === "streaming" && "Streaming audio..."}
+            {streamingState === "error" && "Error connecting to audio stream"}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

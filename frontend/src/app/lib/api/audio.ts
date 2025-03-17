@@ -1,28 +1,38 @@
-import { BACKEND_ENDPOINT } from '@/config';
+import { BACKEND_ENDPOINT } from "@/config";
 
 export class AudioStreamingClient {
   private ws: WebSocket | null = null;
   private audioContext: AudioContext | null = null;
   private sourceNode: AudioBufferSourceNode | null = null;
-  private onStateChange: (state: 'connecting' | 'streaming' | 'stopped' | 'error') => void;
+  private onStateChange: (
+    state: "connecting" | "streaming" | "stopped" | "error",
+  ) => void;
 
-  constructor(onStateChange: (state: 'connecting' | 'streaming' | 'stopped' | 'error') => void) {
+  constructor(
+    onStateChange: (
+      state: "connecting" | "streaming" | "stopped" | "error",
+    ) => void,
+  ) {
     this.onStateChange = onStateChange;
   }
 
   connect() {
     try {
       // Convert http(s) to ws(s) for WebSocket connection
-      const wsUrl = BACKEND_ENDPOINT.replace('https://', 'wss://').replace('http://', 'ws://') + '/radio-streams';
-      console.log('Connecting to radio stream:', wsUrl);
-      
+      const wsUrl =
+        BACKEND_ENDPOINT.replace("https://", "wss://").replace(
+          "http://",
+          "ws://",
+        ) + "/radio-streams";
+      console.log("Connecting to radio stream:", wsUrl);
+
       this.ws = new WebSocket(wsUrl);
       this.audioContext = new AudioContext();
-      this.onStateChange('connecting');
+      this.onStateChange("connecting");
 
       this.ws.onopen = () => {
-        console.log('WebSocket connection established');
-        this.onStateChange('streaming');
+        console.log("WebSocket connection established");
+        this.onStateChange("streaming");
       };
 
       this.ws.onmessage = async (event) => {
@@ -31,23 +41,23 @@ export class AudioStreamingClient {
             const arrayBuffer = await event.data.arrayBuffer();
             await this.playAudioChunk(arrayBuffer);
           } catch (error) {
-            console.error('Error processing audio chunk:', error);
+            console.error("Error processing audio chunk:", error);
           }
         }
       };
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this.onStateChange('error');
+        console.error("WebSocket error:", error);
+        this.onStateChange("error");
       };
 
       this.ws.onclose = () => {
-        console.log('WebSocket connection closed');
-        this.onStateChange('stopped');
+        console.log("WebSocket connection closed");
+        this.onStateChange("stopped");
       };
     } catch (error) {
-      console.error('Error connecting to WebSocket:', error);
-      this.onStateChange('error');
+      console.error("Error connecting to WebSocket:", error);
+      this.onStateChange("error");
     }
   }
 
@@ -61,7 +71,7 @@ export class AudioStreamingClient {
       this.sourceNode.connect(this.audioContext.destination);
       this.sourceNode.start();
     } catch (error) {
-      console.error('Error playing audio chunk:', error);
+      console.error("Error playing audio chunk:", error);
     }
   }
 
@@ -78,7 +88,7 @@ export class AudioStreamingClient {
       this.audioContext.close();
       this.audioContext = null;
     }
-    this.onStateChange('stopped');
+    this.onStateChange("stopped");
   }
 
   sendFlowCommand(command: string) {
@@ -86,4 +96,4 @@ export class AudioStreamingClient {
       this.ws.send(JSON.stringify({ text: command }));
     }
   }
-} 
+}

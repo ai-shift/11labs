@@ -1,5 +1,5 @@
-import { Play, SkipForward, SkipBack } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Play, SkipForward, SkipBack } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AudioPlayer() {
   return (
@@ -21,6 +21,5 @@ export default function AudioPlayer() {
         </Button>
       </div>
     </div>
-  )
+  );
 }
-

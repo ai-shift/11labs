@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface CustomizationProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export default function Customization({ onClose }: CustomizationProps) {
@@ -15,17 +21,17 @@ export default function Customization({ onClose }: CustomizationProps) {
     dailyDigest: true,
     voiceInteraction: true,
     dataUsage: false,
-  })
+  });
 
   const handleSettingChange = (setting: keyof typeof settings) => {
-    setSettings((prev) => ({ ...prev, [setting]: !prev[setting] }))
-  }
+    setSettings((prev) => ({ ...prev, [setting]: !prev[setting] }));
+  };
 
   const handleSave = () => {
     // Here you would typically save the settings to your backend or local storage
-    console.log("Saving settings:", settings)
-    onClose()
-  }
+    console.log("Saving settings:", settings);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -67,6 +73,5 @@ export default function Customization({ onClose }: CustomizationProps) {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-

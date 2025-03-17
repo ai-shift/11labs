@@ -1,29 +1,39 @@
-"use client"
+"use client";
 
-import { X, Mic, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { X, Mic, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Interest {
-  id: string
-  name: string
-  position: "left" | "right"
-  isDotted?: boolean
+  id: string;
+  name: string;
+  position: "left" | "right";
+  isDotted?: boolean;
 }
 
 interface ProfileSettingsProps {
-  interests: Interest[]
-  onClose: () => void
+  interests: Interest[];
+  onClose: () => void;
 }
 
-export default function ProfileSettings({ interests, onClose }: ProfileSettingsProps) {
+export default function ProfileSettings({
+  interests,
+  onClose,
+}: ProfileSettingsProps) {
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col items-center p-4 animate-fade-in">
       <div className="w-full max-w-lg">
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={onClose}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4"
+          onClick={onClose}
+        >
           <X className="h-6 w-6 text-gray-600" />
         </Button>
 
-        <h2 className="text-2xl font-bold mt-8 mb-16 text-gray-800 text-center">Profile</h2>
+        <h2 className="text-2xl font-bold mt-8 mb-16 text-gray-800 text-center">
+          Profile
+        </h2>
 
         <div className="relative h-[40vh] flex items-center justify-center">
           {/* Left side interests */}
@@ -64,13 +74,15 @@ export default function ProfileSettings({ interests, onClose }: ProfileSettingsP
         </div>
 
         <div className="flex flex-col items-center mt-16">
-          <Button size="lg" className="rounded-full px-8 py-6 bg-gray-200 text-gray-700 hover:bg-gray-300">
+          <Button
+            size="lg"
+            className="rounded-full px-8 py-6 bg-gray-200 text-gray-700 hover:bg-gray-300"
+          >
             <Mic className="mr-2 h-5 w-5" />
             Speak to Interact
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
