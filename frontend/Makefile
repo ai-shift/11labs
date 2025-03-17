@@ -4,5 +4,5 @@ dev:
 format:
 	pnpm exec biome format --write .
 
-lint:
+lint: format
 	pnpm exec biome lint --write .

@@ -6,19 +6,11 @@ import { AudioRecordingStatus } from "./AudioRecordingStatus";
 interface VoiceInputTranscriberProps {
   isProcessing: boolean;
   idRecording: boolean;
-  ProcessingAudioInfo: React.ComponentType<any>;
-  VolumeLevelIndictor: React.ComponentType<any>;
-  ToggleRecordingButton: React.ComponentType<any>;
-  AudioRecordingStatus: React.ComponentType<any>;
 }
 
 export function VoiceInputTranscriber({
   isProcessing,
   idRecording,
-  ProcessingAudioInfo,
-  VolumeLevelIndictor,
-  ToggleRecordingButton,
-  AudioRecordingStatus,
 }: VoiceInputTranscriberProps) {
   return (
     <>

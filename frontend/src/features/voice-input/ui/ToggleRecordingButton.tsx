@@ -1,12 +1,20 @@
+interface ToggleRecordingButtonProps {
+  isRecording: boolean;
+  isProcessing: boolean;
+  startRecoridng: () => void;
+  stopRecording: () => void;
+}
+
 export function ToggleRecordingButton({
-  isRecording: boolean,
-  isProcessing: boolean,
+  isRecording,
+  isProcessing,
   startRecoridng,
   stopRecording,
-}) {
+}: ToggleRecordingButtonProps) {
   return (
     <div className="relative w-32 h-32 mx-auto">
       <button
+        type="button"
         className={clsx(
           "w-full h-full rounded-full text-white hover:bg-gray-800 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center",
           {
@@ -25,6 +33,7 @@ export function ToggleRecordingButton({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Start recording</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -39,6 +48,7 @@ export function ToggleRecordingButton({
       {isRecording && (
         <div className="mt-8">
           <button
+            type="button"
             onClick={stopRecording}
             className="px-8 py-3 bg-red-500 text-white text-lg font-medium rounded-full hover:bg-red-600 transition-colors shadow-md"
           >

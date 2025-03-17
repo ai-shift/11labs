@@ -99,9 +99,9 @@ export function useVoiceRecording() {
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream
-        .getTracks()
-        .forEach((track) => track.stop());
+      for (const track of mediaRecorderRef.current.stream.getTracks()) {
+        track.stop();
+      }
 
       if (audioContextRef.current) {
         audioContextRef.current.close();

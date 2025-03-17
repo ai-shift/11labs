@@ -21,14 +21,14 @@ export function InterviewPage() {
         {interviewInput === "voice" ? (
           <>
             <VoiceInputTranscriber />
-            <button onClick={() => setIntreviewInput("text")}>
+            <button type="button" onClick={() => setIntreviewInput("text")}>
               Input as text
             </button>
           </>
         ) : (
           <>
             <input />
-            <button onClick={() => setIntreviewInput("voice")}>
+            <button type="button" onClick={() => setIntreviewInput("voice")}>
               Input as voice
             </button>
           </>
