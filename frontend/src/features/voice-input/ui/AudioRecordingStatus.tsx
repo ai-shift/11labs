@@ -1,4 +1,7 @@
-export function AudioRecordingStatus() {
+interface AudioRecordingStatus {
+  isRecording: boolean;
+}
+export function AudioRecordingStatus({ isRecording }: AudioRecordingStatus) {
   return (
     <div className="space-y-2">
       <p className="text-gray-600">

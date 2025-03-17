@@ -1,14 +1,16 @@
+import clsx from "clsx";
+
 interface ToggleRecordingButtonProps {
   isRecording: boolean;
   isProcessing: boolean;
-  startRecoridng: () => void;
+  startRecording: () => void;
   stopRecording: () => void;
 }
 
 export function ToggleRecordingButton({
   isRecording,
   isProcessing,
-  startRecoridng,
+  startRecording,
   stopRecording,
 }: ToggleRecordingButtonProps) {
   return (

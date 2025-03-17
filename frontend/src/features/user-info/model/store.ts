@@ -1,17 +1,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UserInfo {
+export type UserInfo = {
   name: string;
   interests: string[];
   topicsToFollow: string[];
-}
+};
 
-interface UserState {
+export type UserInfoState = {
   userData: UserInfo | null;
   setUserInfo: (data: UserInfo) => void;
   clearUserInfo: () => void;
-}
+};
 
 export const useUserInfoStore = create<UserInfoState>()(
   persist(

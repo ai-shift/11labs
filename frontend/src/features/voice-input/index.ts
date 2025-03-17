@@ -1,1 +1,1 @@
-import { VoiceInputTranscriber } from "./ui/VoiceInputTranscriber";
+export { VoiceInputTranscriber } from "./ui/VoiceInputTranscriber";
