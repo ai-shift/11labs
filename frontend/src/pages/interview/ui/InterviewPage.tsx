@@ -21,7 +21,10 @@ export function InterviewPage() {
         {interviewInput === "voice" ? (
           <>
             <VoiceInputTranscriber />
-            <button type="button" onClick={() => setIntreviewInput("text")}>
+            <button
+              className="text-color-blue-500"
+              type="button"
+              onClick={() => setIntreviewInput("text")}>
               Input as text
             </button>
           </>

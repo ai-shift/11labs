@@ -1,5 +1,5 @@
 dev:
-	npm run dev
+	pnpm exec vite
 
 check:
 	pnpm exec biome check --write .
