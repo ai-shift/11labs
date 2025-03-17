@@ -3,6 +3,7 @@ import { openaiApiKey } from "shared/config";
 
 export function useVoiceRecording() {
   const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [volumeLevel, setVolumeLevel] = useState(0);
@@ -115,6 +116,7 @@ export function useVoiceRecording() {
 
   return {
     isRecording,
+    isProcessing,
     transcript,
     error,
     volumeLevel,
