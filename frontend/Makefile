@@ -5,4 +5,4 @@ format:
 	pnpm exec biome format --write .
 
 lint:
-	npm run lint
+	pnpm exec biome lint --write .
