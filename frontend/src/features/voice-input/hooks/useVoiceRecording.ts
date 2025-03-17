@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { openaiApiKey } from "shared/config";
 
 export function useVoiceRecording() {
   const [isRecording, setIsRecording] = useState(false);
@@ -68,7 +69,7 @@ export function useVoiceRecording() {
             {
               method: "POST",
               headers: {
-                Authorization: `Bearer ${config.openaiApiKey}`,
+                Authorization: `Bearer ${openaiApiKey}`,
               },
               body: formData,
             },
